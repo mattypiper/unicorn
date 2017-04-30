@@ -1,5 +1,5 @@
-#ifndef _QEMU_ELF_H
-#define _QEMU_ELF_H
+#ifndef QEMU_ELF_H
+#define QEMU_ELF_H
 
 /*
  * i386 ELF relocation types
@@ -464,7 +464,7 @@
 #define R_X86_64_JUMP_SLOT	7	/* Create PLT entry */
 #define R_X86_64_RELATIVE	8	/* Adjust by program base */
 #define R_X86_64_GOTPCREL	9	/* 32 bit signed pc relative
-					   offset to GOT */
+                       offset to GOT */
 #define R_X86_64_32		10	/* Direct 32 bit zero extended */
 #define R_X86_64_32S		11	/* Direct 32 bit sign extended */
 #define R_X86_64_16		12	/* Direct 16 bit zero extended */
@@ -557,4 +557,4 @@
 #define R_IA64_DTPREL64LSB	0xb7	/* @dtprel(sym + add), data8 LSB */
 #define R_IA64_LTOFF_DTPREL22	0xba	/* @ltoff(@dtprel(s+a)), imm22 */
 
-#endif /* _QEMU_ELF_H */
+#endif /* QEMU_ELF_H */

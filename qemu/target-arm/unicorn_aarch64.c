@@ -21,11 +21,13 @@ void arm64_release(void* ctx);
 
 void arm64_release(void* ctx)
 {
+    struct uc_struct* uc;
+    ARMCPU* cpu;
     TCGContext *s = (TCGContext *) ctx;
 
     g_free(s->tb_ctx.tbs);
-    struct uc_struct* uc = s->uc;
-    ARMCPU* cpu = (ARMCPU*) uc->cpu;
+    uc = s->uc;
+    cpu = (ARMCPU*) uc->cpu;
     g_free(cpu->cpreg_indexes);
     g_free(cpu->cpreg_values);
     g_free(cpu->cpreg_vmstate_indexes);
@@ -86,6 +88,9 @@ int arm64_reg_read(struct uc_struct *uc, unsigned int *regs, void **vals, int co
                 case UC_ARM64_REG_SP:
                          *(int64_t *)value = ARM_CPU(uc, mycpu)->env.xregs[31];
                          break;
+                case UC_ARM64_REG_NZCV:
+                         *(int32_t *)value = cpsr_read(&ARM_CPU(uc, mycpu)->env) & CPSR_NZCV;
+                         break;
             }
         }
     }
@@ -139,6 +144,9 @@ int arm64_reg_write(struct uc_struct *uc, unsigned int *regs, void* const* vals,
                 case UC_ARM64_REG_SP:
                          ARM_CPU(uc, mycpu)->env.xregs[31] = *(uint64_t *)value;
                          break;
+                case UC_ARM64_REG_NZCV:
+                         cpsr_write(&ARM_CPU(uc, mycpu)->env, *(uint32_t *) value, CPSR_NZCV);
+                         break;
             }
         }
     }
@@ -146,8 +154,12 @@ int arm64_reg_write(struct uc_struct *uc, unsigned int *regs, void* const* vals,
     return 0;
 }
 
-__attribute__ ((visibility ("default")))
+DEFAULT_VISIBILITY
+#ifdef TARGET_WORDS_BIGENDIAN
+void arm64eb_uc_init(struct uc_struct* uc)
+#else
 void arm64_uc_init(struct uc_struct* uc)
+#endif
 {
     register_accel_types(uc);
     arm_cpu_register_types(uc);
